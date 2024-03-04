@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let rightPaddleY = (400 - rightPaddle.clientHeight) / 2;
     const playerSpeed = 5;
 
+    let scoreLeft = 0;
+    let scoreRight = 0;
+
     knobController.addEventListener('wheel', (event) => {
         // Adjust the paddle position based on the wheel movement
         leftPaddleY += event.deltaY > 0 ? paddleSpeed : -paddleSpeed;
@@ -71,17 +74,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Scoring
-        if (ballX < 0 || ballX > 800) {
-            // Reset ball position
-            ballX = 400;
-            ballY = 200;
-            ballSpeedX = -5; // Start moving to the left again
+        if (ballX < 0) {
+            // Player 2 (right paddle) scores
+            scoreRight++;
+            resetGame();
+        } else if (ballX > 800) {
+            // Player 1 (left paddle) scores
+            scoreLeft++;
+            resetGame();
         }
 
+        updateScoreDisplay(); // Update the score display
         ball.style.left = `${ballX}px`;
         ball.style.top = `${ballY}px`;
     }
 
+    function resetGame() {
+        // Reset ball position
+        ballX = 400;
+        ballY = 200;
+        ballSpeedX = -5; // Start moving to the left again
+
+        // Reset paddle positions
+        leftPaddleY = 150;
+        rightPaddleY = (400 - rightPaddle.clientHeight) / 2;
+
+        updatePaddlePosition(leftPaddle, leftPaddleY);
+        updatePaddlePosition(rightPaddle, rightPaddleY);
+    }
+
+    const scoreDisplay = document.createElement('div');
+    scoreDisplay.id = 'scoreDisplay';
+    document.body.appendChild(scoreDisplay);
+
+    function updateScoreDisplay() {
+        scoreDisplay.textContent = `${scoreLeft} - ${scoreRight}`;
+    }
 
     function gameLoop() {
         // Update left paddle position with wheel event
@@ -95,5 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(gameLoop);
     }
 
-    gameLoop(); // Start the game loop
+    // Start the game loop
+    gameLoop();
 });
